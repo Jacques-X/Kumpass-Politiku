@@ -10,7 +10,7 @@ import type { UserResult } from "@/types/compass";
 const LIKERT: { value: LikertValue; label: string }[] = [
   { value: -2, label: "Strongly Disagree" },
   { value: -1, label: "Disagree" },
-  { value: 0, label: "Neutral" },
+  { value: 0, label: "Unsure" },
   { value: 1, label: "Agree" },
   { value: 2, label: "Strongly Agree" },
 ];
@@ -80,6 +80,11 @@ export default function Quiz({ onComplete }: QuizProps) {
           />
         </div>
       </div>
+
+      {/* Instruction */}
+      <p className="text-xs text-slate-400 text-center mb-4 italic">
+        Do not look for the political meaning. Respond to the sentiment. Your first instinct is the most honest.
+      </p>
 
       {/* Question card */}
       <AnimatePresence mode="wait" custom={direction}>

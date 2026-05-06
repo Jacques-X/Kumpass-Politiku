@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import type { Axis, UserResult } from "@/types/compass";
+import type { Axis, IntuitionResult, UserResult } from "@/types/compass";
 import { AXIS_META } from "@/lib/engine";
 import { buildShareUrl, encodeScores } from "@/lib/share";
 import RadarChart from "./RadarChart";
@@ -87,6 +87,73 @@ function SystemBadge({ f }: { f: number }) {
   );
 }
 
+// ── Intuition card ────────────────────────────────────────────────────────────
+
+function IntuitionCard({ intuition }: { intuition: IntuitionResult }) {
+  const { neutralCount, totalQuestions, neutralRate, isUndecidedObserver } = intuition;
+  const decisiveCount = totalQuestions - neutralCount;
+  const decisivePct = Math.round((1 - neutralRate) * 100);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08 }}
+      className={`rounded-2xl border p-5 mb-6 ${
+        isUndecidedObserver
+          ? "bg-slate-50 border-slate-300"
+          : "bg-white border-slate-200 shadow-sm"
+      }`}
+    >
+      <div className="flex items-start gap-4">
+        <div className="flex-shrink-0 text-3xl leading-none">
+          {isUndecidedObserver ? "🌫️" : "⚡"}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-sm font-bold text-slate-800">
+              {isUndecidedObserver ? "The Undecided Observer" : "Intuition Score"}
+            </p>
+            {isUndecidedObserver && (
+              <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-wide">
+                Flag
+              </span>
+            )}
+          </div>
+
+          {isUndecidedObserver ? (
+            <p className="text-xs text-slate-500 leading-relaxed">
+              You answered Neutral on{" "}
+              <span className="font-semibold text-slate-700">{neutralCount} of {totalQuestions}</span>{" "}
+              propositions ({Math.round(neutralRate * 100)}%). Your results are recorded, but your
+              ideological signal is weak — you may be genuinely centrist, deliberately evasive, or
+              simply resistant to gut-feeling prompts.
+            </p>
+          ) : (
+            <p className="text-xs text-slate-500 leading-relaxed">
+              You gave a decisive gut reaction to{" "}
+              <span className="font-semibold text-slate-700">{decisiveCount} of {totalQuestions}</span>{" "}
+              propositions. Your results carry a strong ideological signal.
+            </p>
+          )}
+
+          {/* Decisiveness bar */}
+          <div className="mt-3 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ backgroundColor: isUndecidedObserver ? "#94a3b8" : "#2c3e7a" }}
+              initial={{ width: 0 }}
+              animate={{ width: `${decisivePct}%` }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+            />
+          </div>
+          <p className="text-[10px] text-slate-400 mt-1">{decisivePct}% decisive</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ── Main dashboard ────────────────────────────────────────────────────────────
 
 export default function ResultsDashboard({ result, onRetake }: Props) {
@@ -156,6 +223,9 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
       <div className="flex justify-center mb-6">
         <SystemBadge f={scores.transactional} />
       </div>
+
+      {/* Intuition Score */}
+      <IntuitionCard intuition={result.intuition} />
 
       {/* Radar */}
       <motion.div

@@ -31,8 +31,18 @@ export interface Archetype {
   systemLabel: string;
 }
 
+export interface IntuitionResult {
+  neutralCount: number;
+  totalQuestions: number;
+  /** 0.0 – 1.0: fraction of answers that were Neutral */
+  neutralRate: number;
+  /** True when neutralRate > 0.20 */
+  isUndecidedObserver: boolean;
+}
+
 export interface UserResult {
   answers: Record<string, LikertValue>;
   scores: Record<Axis, number>;
   archetype: Archetype;
+  intuition: IntuitionResult;
 }

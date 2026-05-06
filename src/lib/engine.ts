@@ -1,4 +1,4 @@
-import type { Archetype, Axis, AxisMeta, LikertValue, Question, UserResult } from "@/types/compass";
+import type { Archetype, Axis, AxisMeta, IntuitionResult, LikertValue, Question, UserResult } from "@/types/compass";
 
 // ─── Axis metadata ────────────────────────────────────────────────────────────
 
@@ -92,46 +92,46 @@ export function classifyArchetype(scores: Record<Axis, number>): Archetype {
 
   // ── Defined archetypes (ordered by specificity) ──────────────────────────
 
-  // Secular Preservationist: green & progressive
-  if (T < -4 && C < -3) {
-    return {
-      name: "Secular Preservationist",
-      subtitle: G < 0 ? "with Euro-Liberal leanings" : "with Sovereigntist tensions",
-      description:
-        "You want to protect Malta's natural heritage and keep the state out of citizens' personal lives. You believe the island's landscape and individual freedoms are both worth defending against unchecked growth and religious conservatism.",
-      icon: "🌿",
-      systemLabel: sys,
-    };
-  }
-
-  // Sacred Expansionist: concrete & religious
+  // The Concrete Traditionalist: builds + religious
   if (T > 4 && C > 3) {
     return {
-      name: "Sacred Expansionist",
+      name: "The Concrete Traditionalist",
       subtitle: G > 2 ? "with a Sovereigntist outlook" : "with Europeanist pragmatism",
       description:
-        "Growth and God are your twin pillars. You see economic development as progress and Catholic values as the bedrock of a stable society. Malta should build, and Malta should pray.",
+        "Growth and God are your twin pillars. You see cranes on the skyline as progress and Catholic values as the bedrock of a stable society. Malta should build — and Malta should pray.",
       icon: "⛪",
       systemLabel: sys,
     };
   }
 
-  // Sovereign Traditionalist: religion + anti-EU
+  // The Secular Preservationist: green + secular
+  if (T < -4 && C < -3) {
+    return {
+      name: "The Secular Preservationist",
+      subtitle: G < 0 ? "with Europeanist leanings" : "with Sovereigntist tensions",
+      description:
+        "You want to protect Malta's natural heritage and keep the state out of citizens' personal lives. The island's landscape and individual freedoms are both worth defending against unchecked growth and religious conservatism.",
+      icon: "🌿",
+      systemLabel: sys,
+    };
+  }
+
+  // The Sacred Sovereigntist: religious + closed borders
   if (C > 4 && G > 4) {
     return {
-      name: "Sovereign Traditionalist",
-      subtitle: "Malta-First conservative",
+      name: "The Sacred Sovereigntist",
+      subtitle: "Malta-first conservative",
       description:
-        "Faith and national sovereignty are non-negotiable. You distrust Brussels and believe Malta's Catholic identity is under siege from both foreign migration and liberal ideology. The island must govern itself, by its own values.",
+        "Faith and national sovereignty are non-negotiable. You distrust Brussels and believe Malta's Catholic identity is under siege from foreign migration and liberal ideology. The island must govern itself, by its own values.",
       icon: "🇲🇹",
       systemLabel: sys,
     };
   }
 
-  // Civic Reformer: anti-clientelist + progressive
+  // The Civic Reformer: principled + secular
   if (F < -4 && C < -3) {
     return {
-      name: "Civic Reformer",
+      name: "The Civic Reformer",
       subtitle: "meritocracy-first progressive",
       description:
         "You see the clientelist system as Malta's deepest structural flaw. You want independent institutions, secular governance, and a culture where merit — not who you know — determines outcomes.",
@@ -140,46 +140,94 @@ export function classifyArchetype(scores: Record<Axis, number>): Archetype {
     };
   }
 
-  // System Pragmatist: high F
-  if (F > 5) {
+  // The Tribal Globalist: clientelist + open borders (unusual combo)
+  if (F > 4 && G < -3) {
     return {
-      name: "System Pragmatist",
-      subtitle: T > 0 ? "with development instincts" : "with preservationist leanings",
+      name: "The Tribal Globalist",
+      subtitle: "loyalist with an open door",
       description:
-        "You're comfortable with how politics actually works in Malta. Personal relationships, party loyalty, and the exchange of favours are part of the social contract — not corruption, just reality.",
+        "You navigate life through networks and personal loyalty, yet you're comfortable with Malta's place in a wider world. Favours flow through familiar faces, but you don't fear the foreigner.",
+      icon: "🌐",
+      systemLabel: sys,
+    };
+  }
+
+  // The Principled Nationalist: reformist + closed borders
+  if (F < -4 && G > 3) {
+    return {
+      name: "The Principled Nationalist",
+      subtitle: "clean governance, closed gates",
+      description:
+        "You want a Malta run on rules, not relationships — but those rules should be made here, not in Brussels. Meritocracy at home, sovereignty abroad.",
+      icon: "🏛️",
+      systemLabel: sys,
+    };
+  }
+
+  // The Tribal Sovereigntist: clientelist + closed borders
+  if (F > 4 && G > 3) {
+    return {
+      name: "The Tribal Sovereigntist",
+      subtitle: "loyalty and closed borders",
+      description:
+        "You believe in taking care of your own — your people, your party, your island. Personal networks matter, and so do national borders. Malta belongs to the Maltese, and the Maltese take care of each other.",
       icon: "🤝",
       systemLabel: sys,
     };
   }
 
-  // System Reformer: low F
-  if (F < -5) {
+  // The Civic Internationalist: principled + open
+  if (F < -4 && G < -3) {
     return {
-      name: "System Reformer",
-      subtitle: G < 0 ? "with internationalist vision" : "with a local focus",
+      name: "The Civic Internationalist",
+      subtitle: "rules-based, globally minded",
       description:
-        "You reject the transactional culture that defines Maltese politics. Public roles should be earned, not gifted. Party media should be banned. You want a Malta that runs on rules, not relationships.",
-      icon: "🔧",
-      systemLabel: sys,
-    };
-  }
-
-  // Green Cosmopolitan: preservationist + internationalist
-  if (T < -3 && G < -3) {
-    return {
-      name: "Green Cosmopolitan",
-      subtitle: "environmentalist & Europeanist",
-      description:
-        "You believe Malta's future lies in European integration and a green economy. You'd rather have a smaller, cleaner island than a bigger, more prosperous one scarred by overdevelopment.",
+        "You reject transactional politics and believe Malta's future is bound to Europe and the international rules-based order. Institutions should be independent, borders relatively open, and governance transparent.",
       icon: "🌍",
       systemLabel: sys,
     };
   }
 
-  // Nationalist Developer: expansionist + sovereigntist
+  // The Green Cosmopolitan: preservationist + internationalist
+  if (T < -3 && G < -3) {
+    return {
+      name: "The Green Cosmopolitan",
+      subtitle: "environmentalist & Europeanist",
+      description:
+        "Malta's future lies in European integration and a green economy. You'd rather have a smaller, cleaner island than a bigger, more prosperous one scarred by overdevelopment and closed off from the world.",
+      icon: "♻️",
+      systemLabel: sys,
+    };
+  }
+
+  // The Secular Expansionist: builds + secular
+  if (T > 3 && C < -3) {
+    return {
+      name: "The Secular Expansionist",
+      subtitle: "growth without the altar",
+      description:
+        "You want a modern, forward-looking Malta: built up, economically aggressive, and free from the influence of the Church. Progress means development and individual liberty — not tradition.",
+      icon: "🏙️",
+      systemLabel: sys,
+    };
+  }
+
+  // The Sacred Conservationist: protects land + religious (unusual combo)
+  if (T < -3 && C > 3) {
+    return {
+      name: "The Sacred Conservationist",
+      subtitle: "faith and field",
+      description:
+        "You see Malta's rural landscape and Catholic heritage as two sides of the same coin — both worth defending against the bulldozer and the secularist. Some things should simply not be touched.",
+      icon: "⛩️",
+      systemLabel: sys,
+    };
+  }
+
+  // The Nationalist Developer: expansionist + sovereigntist
   if (T > 3 && G > 3) {
     return {
-      name: "Nationalist Developer",
+      name: "The Nationalist Developer",
       subtitle: "growth-first sovereigntist",
       description:
         "Economic expansion is Malta's destiny and Brussels shouldn't stand in the way. You want a Malta that builds, controls its own borders, and answers to no one but its own people.",
@@ -188,10 +236,10 @@ export function classifyArchetype(scores: Record<Axis, number>): Archetype {
     };
   }
 
-  // Progressive Sovereigntist: secular + anti-EU (unusual combo)
+  // The Progressive Sovereigntist: secular + anti-EU (unusual combo)
   if (C < -3 && G > 3) {
     return {
-      name: "Progressive Sovereigntist",
+      name: "The Progressive Sovereigntist",
       subtitle: "secular but Malta-first",
       description:
         "You want a liberal, secular Malta free from both the Church's moral authority and Brussels' political authority. Individual rights, yes — but decided here, not in Strasbourg.",
@@ -200,7 +248,7 @@ export function classifyArchetype(scores: Record<Axis, number>): Archetype {
     };
   }
 
-  // Centrist catch-all
+  // The Pragmatic Centrist: catch-all
   return {
     name: "The Pragmatic Centrist",
     subtitle: "balanced across all axes",
@@ -208,6 +256,24 @@ export function classifyArchetype(scores: Record<Axis, number>): Archetype {
       "Your views don't map neatly onto any single ideological camp. You're selective: pragmatic where it counts, principled where you care. Malta's political landscape can't easily claim you.",
     icon: "⚡",
     systemLabel: sys,
+  };
+}
+
+// ─── Intuition score ──────────────────────────────────────────────────────────
+
+export function computeIntuition(
+  questions: Question[],
+  answers: Record<string, LikertValue>
+): IntuitionResult {
+  const total = questions.length;
+  const neutralCount = questions.filter((q) => (answers[q.id] ?? 0) === 0).length;
+  const neutralRate = total > 0 ? neutralCount / total : 0;
+
+  return {
+    neutralCount,
+    totalQuestions: total,
+    neutralRate: Math.round(neutralRate * 100) / 100,
+    isUndecidedObserver: neutralRate > 0.2,
   };
 }
 
@@ -226,5 +292,6 @@ export function computeResult(
     answers,
     scores,
     archetype: classifyArchetype(scores),
+    intuition: computeIntuition(questions, answers),
   };
 }
