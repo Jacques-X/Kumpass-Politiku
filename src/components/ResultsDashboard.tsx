@@ -10,7 +10,7 @@ interface Props {
   onRetake: () => void;
 }
 
-// ── Barra tal-iskor ───────────────────────────────────────────────────────────
+// ── Score bar ─────────────────────────────────────────────────────────────────
 
 function ScoreBar({ axis, score }: { axis: Axis; score: number }) {
   const meta = AXIS_META.find((m) => m.axis === axis)!;
@@ -31,10 +31,10 @@ function ScoreBar({ axis, score }: { axis: Axis; score: number }) {
       </div>
 
       <div className="relative h-3 bg-slate-100 rounded-full overflow-visible">
-        {/* Tikka taċ-ċentru */}
+        {/* Centre tick */}
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-300 z-0" />
 
-        {/* Traċċa mimlija miċ-ċentru sad-dott */}
+        {/* Filled track from centre to dot */}
         <motion.div
           className="absolute top-0 bottom-0 rounded-full z-0"
           style={{
@@ -47,7 +47,7 @@ function ScoreBar({ axis, score }: { axis: Axis; score: number }) {
           transition={{ duration: 0.5, delay: 0.1 }}
         />
 
-        {/* Dott */}
+        {/* Dot */}
         <motion.div
           className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-white shadow-md z-10"
           style={{
@@ -69,7 +69,7 @@ function ScoreBar({ axis, score }: { axis: Axis; score: number }) {
   );
 }
 
-// ── Badge tal-integrazzjoni tas-sistema ──────────────────────────────────────
+// ── System integration badge ───────────────────────────────────────────────────
 
 function SystemBadge({ f }: { f: number }) {
   const isPragmatist = f > 5;
@@ -86,12 +86,12 @@ function SystemBadge({ f }: { f: number }) {
       }`}
     >
       <span className={`w-2 h-2 rounded-full ${isPragmatist ? "bg-amber-500" : "bg-emerald-500"}`} />
-      {isPragmatist ? "Pragmatiku tas-Sistema" : "Riformatur tas-Sistema"}
+      {isPragmatist ? "System Pragmatist" : "System Reformer"}
     </div>
   );
 }
 
-// ── Dashboard ewlenija ────────────────────────────────────────────────────────
+// ── Main dashboard ────────────────────────────────────────────────────────────
 
 export default function ResultsDashboard({ result, onRetake }: Props) {
   const { archetype, scores } = result;
@@ -103,17 +103,17 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
       animate={{ opacity: 1 }}
       className="max-w-xl mx-auto px-4 py-8"
     >
-      {/* Intestatura */}
+      {/* Header */}
       <div className="text-center mb-8">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">
-          Il-Profil Ideoloġiku Tiegħek
+          Your Ideological Profile
         </p>
         <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
           Kumpass Politiku
         </h2>
       </div>
 
-      {/* Karta tal-arkettip */}
+      {/* Archetype card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -125,7 +125,7 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
           <span className="text-5xl leading-none flex-shrink-0">{archetype.icon}</span>
           <div className="min-w-0">
             <p className="text-slate-400 text-[10px] uppercase tracking-widest mb-1">
-              Arkettip
+              Archetype
             </p>
             <h3 className="text-xl font-bold leading-tight">{archetype.name}</h3>
             <p className="text-slate-400 text-xs italic mb-3">{archetype.subtitle}</p>
@@ -133,7 +133,7 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
 
             <div className="mt-4 pt-4 border-t border-slate-700">
               <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1.5">
-                Integrazzjoni fis-Sistema
+                System Integration
               </p>
               <p className="text-sm font-semibold text-slate-200">{archetype.systemLabel}</p>
             </div>
@@ -141,7 +141,7 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
         </div>
       </motion.div>
 
-      {/* Badge tas-sistema */}
+      {/* System badge */}
       <div className="flex justify-center mb-6">
         <SystemBadge f={scores.transactional} />
       </div>
@@ -153,23 +153,23 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
         transition={{ delay: 0.1 }}
         className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6"
       >
-        <h3 className="text-sm font-semibold text-slate-600 mb-4">Forma tal-4 Assi</h3>
+        <h3 className="text-sm font-semibold text-slate-600 mb-4">4-Axis Shape</h3>
         <RadarChart result={result} />
       </motion.div>
 
-      {/* Barri tal-iskor */}
+      {/* Score bars */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
         className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8"
       >
-        <h3 className="text-sm font-semibold text-slate-600 mb-5">Koordinati Assoluti</h3>
+        <h3 className="text-sm font-semibold text-slate-600 mb-5">Raw Coordinates</h3>
         {axes.map((axis) => (
           <ScoreBar key={axis} axis={axis} score={scores[axis]} />
         ))}
 
-        {/* Ringiela tal-leġġenda */}
+        {/* Legend row */}
         <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-x-6 gap-y-2">
           {AXIS_META.map((m) => (
             <div key={m.axis} className="flex items-center gap-2 text-xs text-slate-500">
@@ -183,7 +183,7 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
         </div>
       </motion.div>
 
-      {/* Erġa' agħmel */}
+      {/* Retake */}
       <div className="text-center">
         <button
           onClick={onRetake}
@@ -192,11 +192,9 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#334155")}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#1e293b")}
         >
-          Erġa&apos; Agħmel il-Kumpass
+          Retake the Compass
         </button>
-        <p className="text-xs text-slate-400 mt-3">
-          L-ebda data ma tinħażen. Ir-riżultati jeżistu biss fil-browser tiegħek.
-        </p>
+        <p className="text-xs text-slate-400 mt-3">No data is stored. Results exist only in your browser.</p>
       </div>
     </motion.div>
   );

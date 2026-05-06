@@ -8,9 +8,9 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Kumpass Politiku — Il-Boxxla Politika Maltija",
+  title: "Kumpass Politiku — Maltese Political Compass",
   description:
-    "50 mistoqsija. 4 assi. Skopri fejn tinsab ideoloġikament — mingħajr tikketti tribali.",
+    "50 questions. 4 axes. Find out where you stand ideologically — no tribal labels.",
 };
 
 export default function RootLayout({

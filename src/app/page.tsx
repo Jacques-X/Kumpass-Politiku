@@ -8,11 +8,11 @@ import ResultsDashboard from "@/components/ResultsDashboard";
 
 type Phase = "landing" | "quiz" | "results";
 
-const ASSI = [
-  { label: "Territorjali", sub: "Konservattiv ↔ Espansjonist", color: "#4a7c59", icon: "🏛️" },
-  { label: "Kulturali", sub: "Sekular ↔ Sagru", color: "#c0392b", icon: "⛪" },
-  { label: "Sistema", sub: "Riformatur ↔ Pragmatiku", color: "#d4a017", icon: "⚖️" },
-  { label: "Globali", sub: "Internazzjonalist ↔ Sovranist", color: "#2c3e7a", icon: "🌍" },
+const AXES = [
+  { label: "Territorial", sub: "Preservationist ↔ Expansionist", color: "#4a7c59", icon: "🏛️" },
+  { label: "Cultural", sub: "Secular ↔ Sacred", color: "#c0392b", icon: "⛪" },
+  { label: "System", sub: "Reformer ↔ Pragmatist", color: "#d4a017", icon: "⚖️" },
+  { label: "Global", sub: "Internationalist ↔ Sovereigntist", color: "#2c3e7a", icon: "🌍" },
 ];
 
 export default function Home() {
@@ -23,7 +23,7 @@ export default function Home() {
     <main className="min-h-screen" style={{ backgroundColor: "#f8f7f4" }}>
       <AnimatePresence mode="wait">
 
-        {/* ── Paġna tal-bidu ───────────────────────────────────────────────── */}
+        {/* ── Landing ──────────────────────────────────────────────────────── */}
         {phase === "landing" && (
           <motion.div
             key="landing"
@@ -36,48 +36,48 @@ export default function Home() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold tracking-widest uppercase mb-8">
               <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-              Analiżi Ideoloġika Oġġettiva
+              Objective Ideological Analysis
             </div>
 
-            {/* Titlu */}
+            {/* Title */}
             <h1 className="text-5xl sm:text-6xl font-black text-slate-900 tracking-tight mb-3 leading-none">
               Kumpass<br className="sm:hidden" /> Politiku
             </h1>
             <p className="text-lg text-slate-500 max-w-sm mx-auto mb-10 leading-relaxed">
-              50 mistoqsija. 4 assi. Ebda tikketti tribali.{" "}
+              50 questions. 4 axes. Zero tribal labels.{" "}
               <span className="text-slate-700 font-medium">
-                Skopri dak li temmnu tassew.
+                Find out what you actually believe.
               </span>
             </p>
 
-            {/* Grilja tal-assi */}
+            {/* Axes grid */}
             <div className="grid grid-cols-2 gap-3 max-w-sm w-full mb-10">
-              {ASSI.map((assi) => (
+              {AXES.map((axis) => (
                 <div
-                  key={assi.label}
+                  key={axis.label}
                   className="bg-white rounded-2xl p-4 border border-slate-200 text-left"
                 >
-                  <span className="text-2xl mb-2 block">{assi.icon}</span>
-                  <p className="text-sm font-bold text-slate-800">{assi.label}</p>
+                  <span className="text-2xl mb-2 block">{axis.icon}</span>
+                  <p className="text-sm font-bold text-slate-800">{axis.label}</p>
                   <p
                     className="text-[10px] font-medium mt-0.5 leading-snug"
-                    style={{ color: assi.color }}
+                    style={{ color: axis.color }}
                   >
-                    {assi.sub}
+                    {axis.sub}
                   </p>
                 </div>
               ))}
             </div>
 
-            {/* Dikjarazzjoni */}
+            {/* Disclaimer */}
             <div className="max-w-sm w-full bg-white border border-slate-200 rounded-2xl p-4 mb-8 text-left">
               <p className="text-xs font-bold text-slate-700 mb-1">
-                Dan mhuwiex test partiġġjan.
+                This is not a partisan test.
               </p>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Il-Kumpass Politiku jkejjel l-ideoloġija, mhux il-lealtà. L-ebda isem
-                ta&apos; partit ma jiġi msemmi. Ir-riżultat tiegħek huwa koordinata —
-                mhux tikketta mogħtija lilek minn magna politika.
+                The Kumpass Politiku measures ideology, not loyalty. No party names are
+                mentioned. Your result is a coordinate — not a label handed to you by a
+                political machine.
               </p>
             </div>
 
@@ -86,15 +86,15 @@ export default function Home() {
               className="px-9 py-4 rounded-full text-white font-bold text-base shadow-lg transition-all duration-200 active:scale-95 hover:shadow-xl"
               style={{ backgroundColor: "#1e293b" }}
             >
-              Ibda l-Kumpass →
+              Begin the Compass →
             </button>
             <p className="text-xs text-slate-400 mt-4">
-              ~8 minuti · 50 mistoqsija · Kompletament anonimu
+              ~8 minutes · 50 questions · Fully anonymous
             </p>
           </motion.div>
         )}
 
-        {/* ── Il-kwiżż ─────────────────────────────────────────────────────── */}
+        {/* ── Quiz ─────────────────────────────────────────────────────────── */}
         {phase === "quiz" && (
           <motion.div
             key="quiz"
@@ -109,7 +109,7 @@ export default function Home() {
                 onClick={() => setPhase("landing")}
                 className="text-slate-400 hover:text-slate-700 text-sm transition-colors"
               >
-                ← Lura
+                ← Back
               </button>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                 Kumpass Politiku
@@ -125,7 +125,7 @@ export default function Home() {
           </motion.div>
         )}
 
-        {/* ── Ir-riżultati ─────────────────────────────────────────────────── */}
+        {/* ── Results ──────────────────────────────────────────────────────── */}
         {phase === "results" && result && (
           <motion.div
             key="results"

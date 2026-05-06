@@ -8,11 +8,11 @@ import { computeResult } from "@/lib/engine";
 import type { UserResult } from "@/types/compass";
 
 const LIKERT: { value: LikertValue; label: string }[] = [
-  { value: -2, label: "Ma naqbilx bis-sħiħ" },
-  { value: -1, label: "Ma naqbilx" },
-  { value: 0, label: "Newtrali" },
-  { value: 1, label: "Naqbel" },
-  { value: 2, label: "Naqbel bis-sħiħ" },
+  { value: -2, label: "Strongly Disagree" },
+  { value: -1, label: "Disagree" },
+  { value: 0, label: "Neutral" },
+  { value: 1, label: "Agree" },
+  { value: 2, label: "Strongly Agree" },
 ];
 
 const AXIS_COLOR: Record<string, string> = {
@@ -23,10 +23,10 @@ const AXIS_COLOR: Record<string, string> = {
 };
 
 const AXIS_LABEL: Record<string, string> = {
-  territorial: "Territorjali",
-  cultural: "Kulturali",
-  transactional: "Sistema",
-  global: "Globali",
+  territorial: "Territorial",
+  cultural: "Cultural",
+  transactional: "System",
+  global: "Global",
 };
 
 interface QuizProps {
@@ -65,11 +65,11 @@ export default function Quiz({ onComplete }: QuizProps) {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-6">
-      {/* Barra tal-progress */}
+      {/* Progress */}
       <div className="mb-8">
         <div className="flex justify-between text-xs text-slate-400 mb-1.5 font-medium">
           <span>{index + 1} / {total}</span>
-          <span style={{ color: axisColor }}>Assi {axisLabel}</span>
+          <span style={{ color: axisColor }}>{axisLabel} Axis</span>
         </div>
         <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
           <motion.div
@@ -81,7 +81,7 @@ export default function Quiz({ onComplete }: QuizProps) {
         </div>
       </div>
 
-      {/* Karta tal-mistoqsija */}
+      {/* Question card */}
       <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={question.id}
@@ -102,7 +102,7 @@ export default function Quiz({ onComplete }: QuizProps) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Buttuni tal-Likert */}
+      {/* Likert buttons */}
       <div className="flex flex-col gap-2.5 mb-6">
         {LIKERT.map((opt) => {
           const selected = answers[question.id] === opt.value;
@@ -131,13 +131,13 @@ export default function Quiz({ onComplete }: QuizProps) {
         })}
       </div>
 
-      {/* Lura */}
+      {/* Back */}
       {index > 0 && (
         <button
           onClick={handleBack}
           className="text-xs text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1"
         >
-          ← Mistoqsija ta&apos; qabel
+          ← Previous question
         </button>
       )}
     </div>

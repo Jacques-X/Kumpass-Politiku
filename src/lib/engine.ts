@@ -1,44 +1,44 @@
 import type { Archetype, Axis, AxisMeta, LikertValue, Question, UserResult } from "@/types/compass";
 
-// ─── Metadejta tal-assi ───────────────────────────────────────────────────────
+// ─── Axis metadata ────────────────────────────────────────────────────────────
 
 export const AXIS_META: AxisMeta[] = [
   {
     axis: "territorial",
-    label: "Territorjali",
-    lowLabel: "Konservattiv",
-    highLabel: "Espansjonist",
+    label: "Territorial",
+    lowLabel: "Preservationist",
+    highLabel: "Expansionist",
     color: "#4a7c59",
   },
   {
     axis: "cultural",
-    label: "Kulturali",
-    lowLabel: "Sekular",
-    highLabel: "Sagru",
+    label: "Cultural",
+    lowLabel: "Secular",
+    highLabel: "Sacred",
     color: "#c0392b",
   },
   {
     axis: "transactional",
-    label: "Sistema",
-    lowLabel: "Riformatur",
-    highLabel: "Pragmatiku",
+    label: "System",
+    lowLabel: "Reformer",
+    highLabel: "Pragmatist",
     color: "#d4a017",
   },
   {
     axis: "global",
-    label: "Globali",
-    lowLabel: "Internazzjonalist",
-    highLabel: "Sovranist",
+    label: "Global",
+    lowLabel: "Internationalist",
+    highLabel: "Sovereigntist",
     color: "#2c3e7a",
   },
 ];
 
-// ─── Magna tal-kalkolu ────────────────────────────────────────────────────────
+// ─── Scoring engine ───────────────────────────────────────────────────────────
 
 /**
- * Skor direzjonali b'piż għal assi wieħed.
- * Skor = (Σ risposta × direzzjoni × piż) / (Σ 2 × piż) × 10
- * Ir-riżultat huwa limitat għal [-10, +10].
+ * Weighted directional score for one axis.
+ * Score = (Σ response × direction × weight) / (Σ 2 × weight) × 10
+ * Result is clamped to [-10, +10].
  */
 export function scoreAxis(
   questions: Question[],
@@ -62,22 +62,24 @@ export function scoreAxis(
   return Math.round(Math.min(10, Math.max(-10, raw)) * 100) / 100;
 }
 
-// ─── Klassifikatur tal-arkettip ───────────────────────────────────────────────
+// ─── Archetype classifier ─────────────────────────────────────────────────────
 
 /**
- * Territorjali (T): -10 = Konservattiv profond … +10 = Espansjonist profond
- * Kulturali    (C): -10 = Sekular profond      … +10 = Sagru profond
- * Sistema      (F): -10 = Riformatur profond   … +10 = Pragmatiku profond
- * Globali      (G): -10 = Internazzjonalist    … +10 = Sovranist
+ * Compose a descriptive ideological archetype from the four raw axis scores.
  *
- * Ir-regoli jiġu evalwati fl-ordni; l-ewwel waħda li taqbel tirbaħ.
+ * Territory (T): -10 = deep Preservationist … +10 = deep Expansionist
+ * Cultural   (C): -10 = deep Secular        … +10 = deep Sacred
+ * System     (F): -10 = deep Reformer       … +10 = deep Pragmatist
+ * Global     (G): -10 = Internationalist    … +10 = Sovereigntist
+ *
+ * Rules are evaluated in order; first match wins.
  */
-function sistemLabel(f: number): string {
-  if (f > 5) return "Integrazzjoni Għolja fis-Sistema (Pragmatiku tas-Sistema)";
-  if (f < -5) return "Integrazzjoni Baxxa fis-Sistema (Riformatur tas-Sistema)";
-  if (f > 2) return "Integrazzjoni Moderata fis-Sistema";
-  if (f < -2) return "Riformiżmu Moderat tas-Sistema";
-  return "Orjentament Ċentrali tas-Sistema";
+function systemLabel(f: number): string {
+  if (f > 5) return "High System Integration (System Pragmatist)";
+  if (f < -5) return "Low System Integration (System Reformer)";
+  if (f > 2) return "Moderate System Integration";
+  if (f < -2) return "Moderate System Reformism";
+  return "Centrist System Orientation";
 }
 
 export function classifyArchetype(scores: Record<Axis, number>): Archetype {
@@ -86,128 +88,130 @@ export function classifyArchetype(scores: Record<Axis, number>): Archetype {
   const F = scores.transactional;
   const G = scores.global;
 
-  const sys = sistemLabel(F);
+  const sys = systemLabel(F);
 
-  // Konservattiv Sekular: ekoloġiku u progressiv
+  // ── Defined archetypes (ordered by specificity) ──────────────────────────
+
+  // Secular Preservationist: green & progressive
   if (T < -4 && C < -3) {
     return {
-      name: "Konservattiv Sekular",
-      subtitle: G < 0 ? "b'inklinazzjonijiet Euro-Liberali" : "b'tensjonijiet Sovranisti",
+      name: "Secular Preservationist",
+      subtitle: G < 0 ? "with Euro-Liberal leanings" : "with Sovereigntist tensions",
       description:
-        "Trid tipproteġi l-wirt naturali ta' Malta u żżomm l-istat 'il bogħod mill-ħajja personali taċ-ċittadini. Temmen li l-pajsaġġ tal-gżira u l-libertajiet individwali jistħoqqilhom li jiġu difiżi kontra t-tkabbir bla kontroll u l-konservattività reliġjuża.",
+        "You want to protect Malta's natural heritage and keep the state out of citizens' personal lives. You believe the island's landscape and individual freedoms are both worth defending against unchecked growth and religious conservatism.",
       icon: "🌿",
       systemLabel: sys,
     };
   }
 
-  // Espansjonist Sagru: konkrit u reliġjuż
+  // Sacred Expansionist: concrete & religious
   if (T > 4 && C > 3) {
     return {
-      name: "Espansjonist Sagru",
-      subtitle: G > 2 ? "b'perspettiva Sovranista" : "b'pragmatiżmu Ewropeist",
+      name: "Sacred Expansionist",
+      subtitle: G > 2 ? "with a Sovereigntist outlook" : "with Europeanist pragmatism",
       description:
-        "It-tkabbir u Alla huma ż-żewġ pilastri tiegħek. Tara l-iżvilupp ekonomiku bħala progress u l-valuri Kattoliċi bħala l-pedament ta' soċjetà stabbli. Malta għandha tibni, u Malta għandha titlob.",
+        "Growth and God are your twin pillars. You see economic development as progress and Catholic values as the bedrock of a stable society. Malta should build, and Malta should pray.",
       icon: "⛪",
       systemLabel: sys,
     };
   }
 
-  // Tradizzjonalist Sovranist: reliġjuż u kontra l-UE
+  // Sovereign Traditionalist: religion + anti-EU
   if (C > 4 && G > 4) {
     return {
-      name: "Tradizzjonalist Sovranist",
-      subtitle: "konservattiv Malta l-Ewwel",
+      name: "Sovereign Traditionalist",
+      subtitle: "Malta-First conservative",
       description:
-        "Il-fidi u s-sovranità nazzjonali huma mhux negozzjabbli. Ma tafdax lil Brussell u temmen li l-identità Kattolika ta' Malta hija taħt theddida kemm mill-migrazzjoni barranija kif ukoll mill-ideoloġija liberali. Il-gżira trid tiggverna lilha nnifisha, bl-valuri tagħha stess.",
+        "Faith and national sovereignty are non-negotiable. You distrust Brussels and believe Malta's Catholic identity is under siege from both foreign migration and liberal ideology. The island must govern itself, by its own values.",
       icon: "🇲🇹",
       systemLabel: sys,
     };
   }
 
-  // Riformatur Ċiviku: kontra l-klienteliżmu u progressiv
+  // Civic Reformer: anti-clientelist + progressive
   if (F < -4 && C < -3) {
     return {
-      name: "Riformatur Ċiviku",
-      subtitle: "progressiv bil-meritokrazija l-ewwel",
+      name: "Civic Reformer",
+      subtitle: "meritocracy-first progressive",
       description:
-        "Tara s-sistema klientelista bħala l-akbar difett strutturali ta' Malta. Trid istituzzjonijiet indipendenti, governanza laika, u kultura fejn il-mertu — mhux min taf — jiddetermina r-riżultati.",
+        "You see the clientelist system as Malta's deepest structural flaw. You want independent institutions, secular governance, and a culture where merit — not who you know — determines outcomes.",
       icon: "⚖️",
       systemLabel: sys,
     };
   }
 
-  // Pragmatiku tas-Sistema: F għoli
+  // System Pragmatist: high F
   if (F > 5) {
     return {
-      name: "Pragmatiku tas-Sistema",
-      subtitle: T > 0 ? "b'instinti ta' żvilupp" : "b'inklinazzjonijiet konservattivi",
+      name: "System Pragmatist",
+      subtitle: T > 0 ? "with development instincts" : "with preservationist leanings",
       description:
-        "Inti komdu bil-mod kif il-politika taħdem tassew f'Malta. Ir-relazzjonijiet personali, il-lealtà tal-partit, u l-iskambju ta' pjaċiri huma parti mill-kuntratt soċjali — mhux korruzzjoni, sempliċiment ir-realtà.",
+        "You're comfortable with how politics actually works in Malta. Personal relationships, party loyalty, and the exchange of favours are part of the social contract — not corruption, just reality.",
       icon: "🤝",
       systemLabel: sys,
     };
   }
 
-  // Riformatur tas-Sistema: F baxx
+  // System Reformer: low F
   if (F < -5) {
     return {
-      name: "Riformatur tas-Sistema",
-      subtitle: G < 0 ? "b'viżjoni internazzjonalista" : "b'fokus lokali",
+      name: "System Reformer",
+      subtitle: G < 0 ? "with internationalist vision" : "with a local focus",
       description:
-        "Tirrifjuta l-kultura transazzjonali li tiddefinixxi l-politika Maltija. Ir-rwoli pubbliċi għandhom jiġu maqbudin bil-mertu, mhux mogħtija bħala rigali. Il-midja tal-partiti għandha tiġi pprojbita. Trid Malta li taħdem fuq regoli, mhux relazzjonijiet.",
+        "You reject the transactional culture that defines Maltese politics. Public roles should be earned, not gifted. Party media should be banned. You want a Malta that runs on rules, not relationships.",
       icon: "🔧",
       systemLabel: sys,
     };
   }
 
-  // Kosmopolita Ekoloġiku: konservattiv u internazzjonalist
+  // Green Cosmopolitan: preservationist + internationalist
   if (T < -3 && G < -3) {
     return {
-      name: "Kosmopolita Ekoloġiku",
-      subtitle: "ambjentalista u Ewropeist",
+      name: "Green Cosmopolitan",
+      subtitle: "environmentalist & Europeanist",
       description:
-        "Temmen li l-futur ta' Malta jinsab fl-integrazzjoni Ewropea u ekonomija ekoloġika. Tippreferi gżira iżgħar u aktar nadifa minn waħda akbar u aktar prosperuża mġarrfa bl-iżvilupp żejjed.",
+        "You believe Malta's future lies in European integration and a green economy. You'd rather have a smaller, cleaner island than a bigger, more prosperous one scarred by overdevelopment.",
       icon: "🌍",
       systemLabel: sys,
     };
   }
 
-  // Żviluppatur Nazzjonalista: espansjonist u sovranist
+  // Nationalist Developer: expansionist + sovereigntist
   if (T > 3 && G > 3) {
     return {
-      name: "Żviluppatur Nazzjonalista",
-      subtitle: "sovranist li jipprioritizza t-tkabbir",
+      name: "Nationalist Developer",
+      subtitle: "growth-first sovereigntist",
       description:
-        "L-espansjoni ekonomika hija d-destin ta' Malta u Brussell m'għandux jostakolaha. Trid Malta li tibni, tikkontrolla l-fruntieri tagħha, u twieġeb lil ħadd ħlief lil nies tagħha stess.",
+        "Economic expansion is Malta's destiny and Brussels shouldn't stand in the way. You want a Malta that builds, controls its own borders, and answers to no one but its own people.",
       icon: "🏗️",
       systemLabel: sys,
     };
   }
 
-  // Sovranist Progressiv: sekular u kontra l-UE (taħlita rari)
+  // Progressive Sovereigntist: secular + anti-EU (unusual combo)
   if (C < -3 && G > 3) {
     return {
-      name: "Sovranist Progressiv",
-      subtitle: "sekular imma Malta l-ewwel",
+      name: "Progressive Sovereigntist",
+      subtitle: "secular but Malta-first",
       description:
-        "Trid Malta liberali u sekulari ħielsa kemm mill-awtorità morali tal-Knisja kif ukoll mill-awtorità politika ta' Brussell. Drittijiet individwali, iva — imma deċiżi hawn, mhux fi Strasburgu.",
+        "You want a liberal, secular Malta free from both the Church's moral authority and Brussels' political authority. Individual rights, yes — but decided here, not in Strasbourg.",
       icon: "🗽",
       systemLabel: sys,
     };
   }
 
-  // Ċentrist Pragmatiku: għall-oħrajn kollha
+  // Centrist catch-all
   return {
-    name: "Ċentrist Pragmatiku",
-    subtitle: "bilanċjat fuq l-assi kollha",
+    name: "The Pragmatic Centrist",
+    subtitle: "balanced across all axes",
     description:
-      "Il-fehmiet tiegħek ma jaqblux ma' ebda kampja ideoloġika waħda. Inti selettiv: pragmatiku fejn jaqbel, prinċipjat fejn tgħajjat. Il-pajsaġġ politiku ta' Malta ma jistax jiddakrak faċilment.",
+      "Your views don't map neatly onto any single ideological camp. You're selective: pragmatic where it counts, principled where you care. Malta's political landscape can't easily claim you.",
     icon: "⚡",
     systemLabel: sys,
   };
 }
 
-// ─── Pipeline sħiħ ───────────────────────────────────────────────────────────
+// ─── Full pipeline ────────────────────────────────────────────────────────────
 
 export function computeResult(
   questions: Question[],
