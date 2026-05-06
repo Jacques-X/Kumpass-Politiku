@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import type { Axis, UserResult } from "@/types/compass";
 import { AXIS_META } from "@/lib/engine";
+import { buildShareUrl, encodeScores } from "@/lib/share";
 import RadarChart from "./RadarChart";
 
 interface Props {
@@ -31,10 +34,8 @@ function ScoreBar({ axis, score }: { axis: Axis; score: number }) {
       </div>
 
       <div className="relative h-3 bg-slate-100 rounded-full overflow-visible">
-        {/* Centre tick */}
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-300 z-0" />
 
-        {/* Filled track from centre to dot */}
         <motion.div
           className="absolute top-0 bottom-0 rounded-full z-0"
           style={{
@@ -47,13 +48,9 @@ function ScoreBar({ axis, score }: { axis: Axis; score: number }) {
           transition={{ duration: 0.5, delay: 0.1 }}
         />
 
-        {/* Dot */}
         <motion.div
           className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-white shadow-md z-10"
-          style={{
-            left: `calc(${pct}% - 8px)`,
-            backgroundColor: meta.color,
-          }}
+          style={{ left: `calc(${pct}% - 8px)`, backgroundColor: meta.color }}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.15 }}
@@ -74,7 +71,6 @@ function ScoreBar({ axis, score }: { axis: Axis; score: number }) {
 function SystemBadge({ f }: { f: number }) {
   const isPragmatist = f > 5;
   const isReformer = f < -5;
-
   if (!isPragmatist && !isReformer) return null;
 
   return (
@@ -96,6 +92,21 @@ function SystemBadge({ f }: { f: number }) {
 export default function ResultsDashboard({ result, onRetake }: Props) {
   const { archetype, scores } = result;
   const axes: Axis[] = ["territorial", "cultural", "transactional", "global"];
+  const router = useRouter();
+
+  const [copied, setCopied] = useState(false);
+
+  function handleCopyLink() {
+    const url = buildShareUrl(scores);
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  function handleCompare() {
+    router.push(`/compare?a=${encodeScores(scores)}`);
+  }
 
   return (
     <motion.div
@@ -162,14 +173,13 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8"
+        className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6"
       >
         <h3 className="text-sm font-semibold text-slate-600 mb-5">Raw Coordinates</h3>
         {axes.map((axis) => (
           <ScoreBar key={axis} axis={axis} score={scores[axis]} />
         ))}
 
-        {/* Legend row */}
         <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-x-6 gap-y-2">
           {AXIS_META.map((m) => (
             <div key={m.axis} className="flex items-center gap-2 text-xs text-slate-500">
@@ -183,18 +193,48 @@ export default function ResultsDashboard({ result, onRetake }: Props) {
         </div>
       </motion.div>
 
+      {/* Compare & share */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8"
+      >
+        <h3 className="text-sm font-semibold text-slate-600 mb-1">Compare with someone</h3>
+        <p className="text-xs text-slate-400 mb-4">
+          Share your result link — when they open it they can enter their own code to see both shapes side by side.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={handleCopyLink}
+            className="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all duration-150"
+            style={
+              copied
+                ? { borderColor: "#4a7c59", backgroundColor: "#4a7c5912", color: "#4a7c59" }
+                : { borderColor: "#e2e8f0", backgroundColor: "#f8fafc", color: "#475569" }
+            }
+          >
+            {copied ? "✓ Link copied!" : "Copy result link"}
+          </button>
+          <button
+            onClick={handleCompare}
+            className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-150 active:scale-[0.98]"
+            style={{ backgroundColor: "#1e293b" }}
+          >
+            Compare →
+          </button>
+        </div>
+      </motion.div>
+
       {/* Retake */}
       <div className="text-center">
         <button
           onClick={onRetake}
-          className="px-7 py-3 rounded-full font-semibold text-sm transition-colors"
-          style={{ backgroundColor: "#1e293b", color: "#fff" }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#334155")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#1e293b")}
+          className="px-7 py-3 rounded-full font-semibold text-sm transition-colors text-slate-500 hover:text-slate-800"
         >
-          Retake the Compass
+          ← Retake the Compass
         </button>
-        <p className="text-xs text-slate-400 mt-3">No data is stored. Results exist only in your browser.</p>
+        <p className="text-xs text-slate-400 mt-2">No data is stored. Results exist only in your browser.</p>
       </div>
     </motion.div>
   );
